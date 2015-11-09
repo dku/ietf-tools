@@ -1,0 +1,60 @@
+#!/bin/env bash
+
+# Fetch material (slides, agenda, minutes, charter, drafts) for given meeting and group.
+#
+# Copyright (c) 2015 Dirk Kutscher <dku@dkutscher.net>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+# OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+# PERFORMANCE OF THIS SOFTWARE.
+#
+# Usage: get-ietf-material <meetingnr> <groupname>
+# Example: get-get-material 94 icnrg
+
+
+meeting=$1
+group=$2
+target=./${meeting}/${group}
+
+mkdir -p ${target}
+
+wget -O .index.html https://www.ietf.org/proceedings/${meeting}/index.html
+
+
+if [ "$!" == "8" ]; then # server error -- proceedings not yet published?
+    proceedings="https://datatracker.ietf.org/meeting/${meeting}/materials.html"
+
+else
+    proceedings="https://www.ietf.org/proceedings/${meeting}/${group}.html"
+fi
+
+rm -f .index.html
+
+echo "Fetching slides index from ${proceedings}"
+
+#slides
+    wget -O - ${proceedings} | grep -o "https://www\.ietf\.org/proceedings/${meeting}/slides/slides-${meeting}-${group}-[[:digit:]]\+\.[[:alpha:]]\+"  |  wget -P ${target} -N  -i -
+
+#agenda
+wget -N  -O "${target}/agenda.html" https://datatracker.ietf.org/meeting/${meeting}/agenda/${group}/
+
+#minutes
+wget  -N -O "${target}/minutes.html" https://www.ietf.org/proceedings/${meeting}/minutes/minutes-${meeting}-${group} 
+
+#charter
+wget   -N  -O "${target}/charter.html" https://datatracker.ietf.org/group/${group}/charter/
+
+#drafts
+wget -O - https://tools.ietf.org/id/?doc=${group} | grep -o "/id/draft-.*-${group}.*-[[:digit:]]\+\.txt" | sed -e 's/^/https:\/\/tools.ietf.org/' | wget -P ${target} -N -nd -i -
+
+
+
+
