@@ -17,7 +17,9 @@
 # PERFORMANCE OF THIS SOFTWARE.
 #
 # Usage: get-ietf-material <meetingnr> <groupname>
-# Example: get-get-material 94 icnrg
+# Example: get-ietf-material 94 icnrg
+#
+# will store everything under ./<meetingnr>/<groupname>
 
 
 meeting=$1
