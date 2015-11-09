@@ -20,4 +20,4 @@ PERFORMANCE OF THIS SOFTWARE.
 Usage: get-ietf-material <meetingnr> <groupname>
 Example: get-ietf-material 94 icnrg
 
-will store everything under ./<meetingnr>/<groupname>
+will store everything under ./meetingnr/groupname
